@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{{ super() }}
+{% for cat, msg in get_flashed_messages(True) %}
+    <div class="flash {{ cat }}">{{msg}}</div>
+{% endfor %}
+<form action="{{ url_for('change_film') }}" method="POST">
+<p><label>Id фильма для изменения:</label><input type="text" name="id" value="" required /></p>
+<p><label>Новое название:</label><input type="text" name="title" value="" required/></p>
+<p><label>Новый жанр:</label><input type="text" name="genre" value="" required/></p>
+<p><label>Новый отзыв отзыв:</label>
+    <p><textarea name="short_review" rows=7 cols=40></textarea>
+<p><input type="submit" value="Внести изменения"/>
+</form>
+{% endblock %}

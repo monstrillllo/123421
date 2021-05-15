@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{{ super() }}
+    <label>Жанр: {{ genre }}</label><br>
+    <label>Краткий отзыв: {{ short_review }}</label>
+{% endblock %}
