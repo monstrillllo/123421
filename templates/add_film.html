@@ -1,15 +1,17 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends 'base.html' %}
 <head>
+    {% block title %}
     <meta charset="UTF-8">
     <title>create page</title>
+    {% endblock %}
 </head>
-<body>
+
+{% block content %}
+{{ super() }}
 <form action='' method = "POST">
   <p>title <input type = "text" name = "title" /></p>
   <p>genre <input type = "text" name = "genre" /></p>
   <p>short review <input type = "text" name = "short_review" /></p>
   <p><input type = "submit" value = "Submit" /></p>
 </form>
-</body>
-</html>
+{% endblock %}

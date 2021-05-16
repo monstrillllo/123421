@@ -1,15 +1,16 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends 'base.html' %}
 <head>
+    {% block title %}
     <meta charset="UTF-8">
     <title>Film info</title>
+    {% endblock %}
 </head>
-<body>
+{% block content %}
+{{ super() }}
 <h3>Title</h3>
 <p>{{film.title}}</p><hr>
 <h3>Genre</h3>
 <p>{{film.genre}}</p><hr>
 <h3>Short review</h3>
 <p>{{film.short_review}}</p><hr>
-</body>
-</html>
+{% endblock %}

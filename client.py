@@ -8,7 +8,7 @@ films_url = 'http://127.0.0.1:5000/api/v1.0/films'
 
 @app.route('/')
 def hello():
-    return 'HELLO'
+    return render_template('index.html')
 
 
 @app.route('/films/add_film', methods=['GET', 'POST'])

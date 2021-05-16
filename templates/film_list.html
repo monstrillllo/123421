@@ -1,12 +1,16 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends 'base.html' %}
 <head>
+    {% block title %}
     <meta charset="UTF-8">
     <title>Film list</title>
+    {% endblock %}
 </head>
-<body>
+{% block content %}
+{{ super() }}
 {% for film in films %}
-<h3>{{film.id}} - {{ film.title }}</h3><hr>
+    <h3><a href="http://127.0.0.1:5001/films/{{ film.id }}">{{film.id}} - {{ film.title }}</a></h3><hr>
+    <h4><a href="http://127.0.0.1:5001/films/{{ film.id }}/delete">Удалить</a>
+        <a href="http://127.0.0.1:5001/films/{{ film.id }}/change_film">Изменить</a>
+    </h4>
 {% endfor %}
-</body>
-</html>
+{% endblock %}
