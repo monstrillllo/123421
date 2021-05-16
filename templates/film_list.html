@@ -1,10 +1,12 @@
-{% extends 'base.html' %}
-
-{% block content %}
-{{ super() }}
-        <ul>
-        {% for film in film_list -%}
-            <li><a href="{{ url_for('film_list') }}/{{ film.id }}">{{ film.id }}-{{ film.title }}</a> </li>
-        {% endfor %}
-        </ul>
-{% endblock %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Film list</title>
+</head>
+<body>
+{% for film in films %}
+<h3>{{film.id}} - {{ film.title }}</h3><hr>
+{% endfor %}
+</body>
+</html>

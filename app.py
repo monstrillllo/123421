@@ -1,4 +1,4 @@
-from flask import Flask, g, render_template, request, flash, abort
+from flask import Flask, g, render_template, request, flash, abort, jsonify
 import sqlite3
 import os
 
@@ -21,7 +21,6 @@ def connect_db():
 
 
 def create_db():
-    """ Функция для создания таблиц"""
     db = connect_db()
     with app.open_resource('sq_db.sql', mode='r') as f:
         db.cursor().executescript(f.read())
@@ -30,7 +29,6 @@ def create_db():
 
 
 def get_db():
-    """соеденение с дб если оно не установлено"""
     if not hasattr(g, 'link_db'):
         g.link_db = connect_db()
     return g.link_db
@@ -38,84 +36,87 @@ def get_db():
 
 @app.teardown_appcontext
 def close_db(x):
-    """закрытие соединения если оно есть"""
     if hasattr(g, 'link_db'):
         g.link_db.close()
 
 
-@app.route('/')
-@app.route('/index')
-def index():
-    db = get_db()
-    dbase = FDataBase(db)
-    # print(dbase.get_menu())
-    return render_template('index.html', menu=dbase.get_menu())
-
-
-@app.route('/add_film', methods=['GET', 'POST'])
+@app.route('/api/v1.0/films', methods=['POST'])
 def add_film():
     db = get_db()
     dbase = FDataBase(db)
 
-    if request.method == "POST":
-        if len(request.form['title']) >= 4 and len(request.form['genre']) >=4 and len(request.form['short_review']) >= 5:
-            res = dbase.add_film(request.form['title'], request.form['genre'], request.form['short_review'])
-            if not res:
-                flash('Ошибка при добавлениии фильма', category='error')
-            else:
-                flash('Фильм был успешно добавлен', category='success')
-    return render_template('add_film.html', menu=dbase.get_menu(), title='Добавление фильма')
+    if not request.json or 'title' not in request.json \
+            or 'genre' not in request.json or 'short_review' not in request.json:
+        abort(400)
+
+    new_film = {
+        'title': request.json['title'],
+        'genre': request.json['genre'],
+        'short_review': request.json['short_review']
+    }
+    dbase.add_film(new_film['title'], new_film['genre'], new_film['short_review'])
+    # if not res:
+    #     flash('Ошибка при добавлениии фильма', category='error')
+    # else:
+    #     flash('Фильм был успешно добавлен', category='success')
+    return jsonify({'new_film': new_film}), 201
 
 
-@app.route('/film_list/<int:id_film>')
-def film(id_film):
+@app.route('/api/v1.0/films/<int:id_film>', methods=["GET"])
+def get_film(id_film):
     db = get_db()
     dbase = FDataBase(db)
     title, genre, short_review = dbase.get_film(id_film)
     if not title:
         abort(404)
+    film = {
+        'title': title,
+        'genre': genre,
+        'short_review': short_review
+    }
 
-    return render_template('film.html', menu=dbase.get_menu(), title=title, genre=genre, short_review=short_review)
+    # return render_template('film.html', menu=dbase.get_menu(), title=title, genre=genre, short_review=short_review)
+    return jsonify(film)
 
 
-@app.route('/film_list')
-def film_list():
+@app.route('/api/v1.0/films', methods=["GET"])
+def get_film_list():
     db = get_db()
     dbase = FDataBase(db)
-    return render_template('film_list.html', menu=dbase.get_menu(), title="Список фильмов",
-                           film_list=dbase.get_film_list())
+    # return render_template('film_list.html', menu=dbase.get_menu(), title="Список фильмов",
+    #                        film_list=dbase.get_film_list())
+    return jsonify(dbase.get_film_list())
 
 
-@app.route('/delete_film', methods=['GET', 'POST'])
-def delete_film():
-    db = get_db()
-    dbase = FDataBase(db)
-
-    if request.method == "POST":
-        if len(request.form['id']) != 0:
-            res = dbase.delete_film(request.form['id'])
-            if not res:
-                flash('Ошибка при удалении фильма', category='error')
-            else:
-                flash('Фильм был успешно удален', category='success')
-    return render_template('delete_film.html', menu=dbase.get_menu(), title='Удаление фильма')
-
-
-@app.route('/change_film', methods=['GET', 'POST'])
-def change_film():
+@app.route('/api/v1.0/films/<int:id_film>', methods=['DELETE'])
+def delete_film(id_film):
     db = get_db()
     dbase = FDataBase(db)
 
-    if request.method == "POST":
-        if len(request.form['title']) >= 4 and len(request.form['genre']) >= 4 and\
-                len(request.form['short_review']) >= 5 and len(request.form['id']) >= 1:
-            res = dbase.change_film(request.form['id'], request.form['title'], request.form['genre'],
-                                    request.form['short_review'])
-            if not res:
-                flash('Ошибка при изменении фильма', category='error')
-            else:
-                flash('Фильм был успешно изменен', category='success')
-    return render_template('change_film.html', menu=dbase.get_menu(), title='Изменение фильма')
+
+    res = dbase.delete_film(id_film)
+
+    return jsonify({'result': res})
+
+
+@app.route('/api/v1.0/films/<int:id_film>', methods=['PUT'])
+def change_film(id_film):
+    db = get_db()
+    dbase = FDataBase(db)
+
+    # if request.method == "POST":
+    #     if len(request.form['title']) >= 4 and len(request.form['genre']) >= 4 and \
+    #             len(request.form['short_review']) >= 5 and len(request.form['id']) >= 1:
+    #         res = dbase.change_film(request.form['id'], request.form['title'], request.form['genre'],
+    #                                 request.form['short_review'])
+    #         if not res:
+    #             flash('Ошибка при изменении фильма', category='error')
+    #         else:
+    #             flash('Фильм был успешно изменен', category='success')
+
+    res = dbase.change_film(id_film, request.json['title'], request.json['genre'], request.json['short_review'])
+
+    return jsonify({'result': res})
 
 
 if __name__ == '__main__':

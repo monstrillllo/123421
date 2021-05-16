@@ -1,7 +1,15 @@
-{% extends 'base.html' %}
-
-{% block content %}
-{{ super() }}
-    <label>Жанр: {{ genre }}</label><br>
-    <label>Краткий отзыв: {{ short_review }}</label>
-{% endblock %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Film info</title>
+</head>
+<body>
+<h3>Title</h3>
+<p>{{film.title}}</p><hr>
+<h3>Genre</h3>
+<p>{{film.genre}}</p><hr>
+<h3>Short review</h3>
+<p>{{film.short_review}}</p><hr>
+</body>
+</html>
